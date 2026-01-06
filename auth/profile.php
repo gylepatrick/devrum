@@ -1,0 +1,131 @@
+<?php
+session_start();
+require "../db.php";
+
+$userId = $_SESSION['user_id'] ?? null;
+if (!$userId) {
+    header("Location: login.php");
+    exit;
+}
+
+// Fetch user info
+$user = $conn->query("SELECT * FROM users WHERE id=$userId")->fetch_assoc();
+
+// Handle profile update
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $bio = $_POST['bio'] ?? '';
+
+    // Handle avatar upload
+    if (!empty($_FILES['avatar']['name'])) {
+        $targetDir = "../uploads/avatars/";
+        if(!is_dir($targetDir)) mkdir($targetDir, 0777, true);
+        $fileName = time() . basename($_FILES['avatar']['name']);
+        $targetFile = $targetDir . $fileName;
+
+        if (move_uploaded_file($_FILES['avatar']['tmp_name'], $targetFile)) {
+            $conn->query("UPDATE users SET avatar='$targetFile', bio='$bio' WHERE id=$userId");
+            $_SESSION['toast'] = ["success", "Profile updated!"];
+            header("Location: profile.php");
+            exit;
+        } else {
+            $_SESSION['toast'] = ["error", "Failed to upload avatar"];
+        }
+    } else {
+        $conn->query("UPDATE users SET bio='$bio' WHERE id=$userId");
+        $_SESSION['toast'] = ["success", "Profile updated!"];
+        header("Location: profile.php");
+        exit;
+    }
+}
+
+// Fetch user posts
+$posts = $conn->query("SELECT * FROM posts WHERE user_id=$userId ORDER BY created_at DESC");
+
+// Set defaults
+$avatar = $user['avatar'] ?: '../uploads/avatar/defult_profile.jpeg';
+$bio = $user['bio'] ?: 'This user hasn’t written a bio yet.';
+$username = htmlspecialchars($user['username'] ?? 'Unknown');
+$name = htmlspecialchars($user['fullname'] ?? 'Unknown');
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Profile - DevRum</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+/* Instagram-like Profile */
+.profile-header { text-align: center; margin-bottom: 2rem; }
+.profile-avatar { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 3px solid #ddd; }
+.profile-username { font-size: 1.5rem; font-weight: 600; margin-top: 0.5rem; }
+.profile-bio { font-size: 0.95rem; color: #555; margin-bottom: 1rem; }
+.posts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+.posts-grid img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; }
+</style>
+</head>
+<body class="bg-light">
+  
+  <section class="ui-section">
+
+  <nav class="bg-white p-3 rounded-4 m-3">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="../posts/index.php">Home</a></li>
+      <li class="breadcrumb-item active">Profile</li>
+    </ol>
+  </nav>
+</section>
+
+<div class="container py-5">
+
+  <div class="card shadow-sm p-4 rounded-4 mx-auto" style="max-width:600px;">
+    
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <img src="<?= $avatar ?>" alt="Avatar" class="profile-avatar mb-2">
+      <div class="profile-username"><?= $name ?></div>
+      <div class=""><small><i><?= $username ?></i></small></div>
+      <div class="profile-bio"><?= htmlspecialchars($bio) ?></div>
+    </div>
+
+    <!-- Update Form -->
+    <form method="POST" enctype="multipart/form-data" class="d-flex flex-column gap-3">
+      <div class="mb-2">
+        <label class="form-label">Avatar</label>
+        <input type="file" name="avatar" class="form-control form-control-sm">
+      </div>
+      <div>
+        <label class="form-label">Bio</label>
+        <textarea name="bio" class="form-control" rows="2" placeholder="Write something about yourself..."><?php
+          if(!empty($bio)) {
+            echo ($user['bio']);
+          } else {
+            echo "";
+          }
+        ?></textarea>
+      </div>
+      <button class="btn btn-primary mt-2">Update Profile</button>
+    </form>
+
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="toast" class="toast">
+    <div class="toast-body"></div>
+  </div>
+</div>
+
+<?php if (isset($_SESSION["toast"])): ?>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/toast.js"></script>
+<script>
+showToast("<?= $_SESSION['toast'][1] ?>", "<?= $_SESSION['toast'][0] ?>");
+</script>
+<?php unset($_SESSION["toast"]); endif; ?>
+
+</body>
+</html>
