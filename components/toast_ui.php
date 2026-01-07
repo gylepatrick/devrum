@@ -1,0 +1,8 @@
+<div class="toast-container position-fixed top-0 end-0 p-3">
+  <div id="toast" class="toast align-items-center border-0" role="alert">
+    <div class="d-flex">
+      <div class="toast-body"></div>
+      <button class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
