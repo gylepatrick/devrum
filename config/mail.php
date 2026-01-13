@@ -13,7 +13,7 @@ function sendVerificationMail($email, $code) {
         $mail->SMTPAuth = true;
         $mail->Username = "f0d4b95cce15b5";
         $mail->Password = "eb32d0b84c1c4f"; // Gmail App Password
-        // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 2525;
 
         $mail->setFrom("lukinhaygylepatrick@gmail.com", "DevRum");
