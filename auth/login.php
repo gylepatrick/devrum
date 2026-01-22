@@ -13,6 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($user && password_verify($_POST["password"], $user["password"])) {
         $_SESSION["user"] = $user["username"];
         $_SESSION["user_id"] = $user["id"];
+        $_SESSION["image"] = $user["avatar"];
         
         $_SESSION["toast"] = ["success", "Login success!"];
 
@@ -55,26 +56,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Login - DevRum</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="../css/style.css">
-</head>
-<body class="bg-light d-flex justify-content-center align-items-center min-vh-100">
+
+<?php include "../components/auth/header.php"; ?>
 
 <div class="d-flex flex-column align-items-center justify-content-center w-100">
 
-  <!-- Site Name -->
-<h1 class="text-center fw-bold mb-4">
-    <span class="text-primary">DEV</span>Rum
-  </h1>
+
 
   <!-- Login Card -->
-  <div class="card p-4 shadow-sm rounded-4" style="width: 360px; background-color: #fff;">
-    <h3 class="mb-4 text-center fw-bold">Sign In</h3>
+  <div class="card p-4 shadow-sm rounded-4" style="width: 560px; background-color: #fff;">
+    <!-- Site Name -->
+    <h1 class="text-center fw-bold mb-4">
+        <span class="text-primary">DEV</span>RUM
+    </h1>
+    <h3 class="mb-4 text-center fw-bold text-uppercase">Sign In</h3>
 
     <form method="POST" class="d-flex flex-column gap-3">
       <input name="username" class="form-control form-control-lg rounded-3" placeholder="Username" required>
@@ -89,20 +84,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 </div>
 
-<!-- Toast Container -->
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-  <div id="toast" class="toast">
-    <div class="toast-body"></div>
-  </div>
-</div>
-
-<?php if (isset($_SESSION["toast"])): ?>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="../js/toast.js"></script>
-<script>
-  showToast("<?= $_SESSION['toast'][1] ?>", "<?= $_SESSION['toast'][0] ?>");
-</script>
-<?php unset($_SESSION["toast"]); endif; ?>
-
-</body>
-</html>
+<?php include "../components/auth/footer.php"; ?>

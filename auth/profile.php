@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Handle avatar upload
     if (!empty($_FILES['avatar']['name'])) {
-        $targetDir = "../uploads/avatars/";
+        $targetDir = "../uploads/avatar/";
         if(!is_dir($targetDir)) mkdir($targetDir, 0777, true);
         $fileName = time() . basename($_FILES['avatar']['name']);
         $targetFile = $targetDir . $fileName;

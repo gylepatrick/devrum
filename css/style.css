@@ -1,65 +1,108 @@
+:root {
+  --brand: #00e5ff;
+  --bg: #0f172a;
+  --card: #111827;
+  --muted: #9ca3af;
+  --border: #1f2933;
+}
+
 body {
-  background-color: #f8f9fa;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #020617;
+  color: #e5e7eb;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+/* NAVBAR */
+.navbar {
+  background: rgba(2, 6, 23, 0.8) !important;
+  backdrop-filter: blur(12px);
 }
 
 .navbar-brand {
-  font-weight: 700;
   letter-spacing: 0.5px;
 }
 
+/* CARDS */
 .card {
-  border: none;
-  border-radius: 14px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
 }
 
-.card img {
-  border-top-left-radius: 14px;
-  border-top-right-radius: 14px;
-  max-height: 380px;
-  object-fit: cover;
+.card-body {
+  padding: 1.5rem;
 }
 
+/* TAGS */
 .badge-tag {
-  background-color: #e7f1ff;
-  color: #0d6efd;
-  font-weight: 500;
-  border-radius: 999px;
+  background: rgba(0, 229, 255, 0.1);
+  color: var(--brand);
   padding: 6px 12px;
+  border-radius: 999px;
   font-size: 12px;
+  text-decoration: none;
+  border: 1px solid rgba(0, 229, 255, 0.25);
 }
 
-.post-meta {
-  font-size: 13px;
-  color: #6c757d;
+.badge-tag:hover {
+  background: rgba(0, 229, 255, 0.2);
+}
+
+/* SIDEBAR */
+.sidebar {
+  position: sticky;
+  top: 90px;
+  background: var(--card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+}
+
+/* POST IMAGE */
+.zoom-container img {
+  border-radius: 12px;
+}
+
+/* BUTTONS */
+.btn-primary {
+  background: var(--brand);
+  border: none;
+  color: #020617;
+  font-weight: 600;
+}
+
+.btn-outline-primary {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.btn-outline-primary:hover {
+  background: var(--brand);
+  color: #020617;
 }
 
 .btn-soft {
-  background-color: #f1f3f5;
+  background: rgba(255, 255, 255, 0.06);
+  color: #e5e7eb;
   border: none;
-  font-size: 13px;
 }
 
 .btn-soft:hover {
-  background-color: #e9ecef;
+  background: rgba(255, 255, 255, 0.12);
 }
 
-.sidebar {
-  position: sticky;
-  top: 80px;
+/* DROP ZONE */
+.drop-zone {
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px dashed var(--border);
 }
 
-
-.comment-box {
-  font-size: 14px;
+.drop-zone.dragover {
+  border-color: var(--brand);
+  background: rgba(0, 229, 255, 0.05);
 }
 
-.comment-box p {
-  margin-bottom: 4px;
-}
-a #uname {
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 15pt;
+/* FOOTER */
+footer {
+  background: #020617 !important;
+  color: var(--muted);
 }

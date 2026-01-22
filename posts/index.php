@@ -2,17 +2,13 @@
 session_start();
 require "../db.php";
 
-// Get tag filter if exists
 $tag = $_GET["tag"] ?? null;
-
 
 $query = "
 SELECT posts.*, users.username, users.avatar
 FROM posts
 JOIN users ON users.id = posts.user_id
-ORDER BY posts.created_at DESC
 ";
-
 
 if ($tag) {
   $query .= "
@@ -22,419 +18,292 @@ if ($tag) {
   ";
 }
 
+$query .= " ORDER BY posts.created_at DESC";
 $posts = $conn->query($query);
-
-// Fetch all tags
-$tags = $conn->query("SELECT * FROM tags");
+$tags  = $conn->query("SELECT * FROM tags");
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>DevRum</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="../css/style.css">
-  <style>
-    .drop-zone {
-      border: 2px dashed #dee2e6;
-      border-radius: 8px;
-      padding: 40px 20px;
-      text-align: center;
-      transition: all 0.3s ease;
-      background-color: #f8f9fa;
-      cursor: pointer;
-    }
-    .drop-zone.dragover {
-      border-color: #0d6efd;
-      background-color: #e7f3ff;
-    }
-    .drop-zone-content {
-      pointer-events: none;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>DevRum | Developer Forum</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+:root {
+  --brand: #22d3ee;
+  --bg-main: #020617;
+  --bg-soft: #020617;
+  --card-bg: rgba(255,255,255,0.06);
+  --card-border: rgba(255,255,255,0.12);
+  --text-main: #e5e7eb;
+  --text-muted: #9ca3af;
+}
+
+/* PAGE BACKGROUND */
+body {
+  background:
+    radial-gradient(60% 40% at 50% 0%, rgba(34,211,238,0.08), transparent 60%),
+    #020617;
+  color: var(--text-main);
+}
+
+/* NAVBAR */
+.navbar {
+  background: rgba(2,6,23,.85) !important;
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--card-border);
+}
+
+/* MAIN POST CARD */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.02),
+    0 20px 40px rgba(0,0,0,0.45);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  transition: 0.2s ease;
+}
+
+/* POST CONTENT */
+.card h5 {
+  color: #f9fafb;
+}
+
+.card p {
+  color: var(--text-muted);
+  font-size: 14.5px;
+}
+
+/* POST IMAGE */
+.card img {
+  background: #020617;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid var(--card-border);
+}
+
+/* TAGS */
+.badge-tag {
+  background: rgba(34,211,238,0.12);
+  color: var(--brand);
+  border: 1px solid rgba(34,211,238,0.35);
+}
+
+/* SIDEBAR */
+.sidebar {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+}
+
+/* LIKE BUTTON */
+.btn-outline-primary {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.btn-primary {
+  background: var(--brand);
+  color: #020617;
+}
+
+/* FOOTER */
+footer {
+  background: linear-gradient(to top, rgba(0,0,0,.6), transparent);
+}
+
+
+.post-user {
+  color: #f9fafb;
+  font-weight: 600;
+}
+
+
+
+</style>
 </head>
+
 <body>
 
 <!-- NAVBAR -->
-
-<nav class="navbar navbar-expand-lg fixed-top bg-white border-bottom shadow-sm">
+<nav class="navbar fixed-top">
   <div class="container-fluid px-4">
-
-    <!-- Brand -->
-    <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="index.php">
-      <span class="text-secondary">DEV<b class="text-primary">Rum</b></span>
+    <a class="navbar-brand fw-bold text-light" href="index.php">
+      DEV<span style="color:var(--brand)">Rum</span>
     </a>
-    <button 
-  class="btn btn-primary btn-sm px-3 rounded-pill fw-semibold"
-  data-bs-toggle="modal"
-  data-bs-target="#askModal">
-  + Ask
-</button>
 
-    <!-- Right actions -->
+    <button class="btn btn-primary btn-sm rounded-pill px-3"
+      data-bs-toggle="modal"
+      data-bs-target="#askModal">
+      + Ask
+    </button>
+
     <div class="ms-auto d-flex align-items-center gap-3">
-      <!-- Profile -->
-      <a href="../auth/profile.php"
-         class="d-flex align-items-center gap-2 text-decoration-none text-dark">
-        <img
-          src="<?= $_SESSION['image'] ?? '../uploads/avatar/defult_profile.jpeg' ?>"
-          class="rounded-circle"
-          style="width:32px;height:32px;object-fit:cover;"
-        >
-        <span class="fw-semibold small"><?= $_SESSION['user'] ?></span>
+      <a href="../auth/profile.php" class="text-decoration-none d-flex align-items-center gap-2 text-light">
+        <img src="<?= $_SESSION['image'] ?? '../uploads/avatars/defult_profile.jpeg' ?>"
+          class="rounded-circle" style="width:34px;height:34px;object-fit:cover;">
+        <span class="small fw-semibold text-white"><?= $_SESSION['user'] ?></span>
       </a>
-    
-      <!-- Logout -->
-      <a href="../auth/logout.php"
-         class="btn btn-outline-dark btn-sm px-3 rounded-pill">
-        Logout
-      </a>
-
+      <a href="../auth/logout.php" class="btn btn-soft btn-sm rounded-pill btn-danger text-white">Logout</a>
     </div>
   </div>
 </nav>
-<div style="height:80px"></div>
+
+<div style="height:90px"></div>
+
 <div class="container-fluid">
-  <div class="row">
-    <!-- TAG SIDEBAR -->
-    <div class="col-md-2 mb-3">
-      <div class="card p-3 sidebar">
-        <h6 class="fw-bold mb-3">Recent Tags</h6>
-        <div class="d-flex flex-wrap gap-2">
-          
-          <?php while ($t = $tags->fetch_assoc()): ?>
-            <a href="?tag=<?= $t['name'] ?>" class="badge-tag">#<?= $t['name'] ?></a>
-          <?php endwhile; ?>
+<div class="row">
 
-          <?php if ($tags->num_rows === 0): ?>
-            <div class="text-muted small">No tags found.</div>
-          <?php endif; ?>
-        </div>
-      </div>
-    </div>
-  
-    <!-- POSTS -->
-    <div class="col-md-6 mx-auto">
-      <?php while ($post = $posts->fetch_assoc()): ?>
-        <div class="card mb-4">
-          <div class="d-flex align-items-center gap-2 mb-2">
-
-  <?php include "../components/posts/avatar_component.php"; ?>
-
-  <?php include "../components/posts/readmore_component.php"; ?>a
-
-</div>
-  
-
-
-            <?php if ($post["image"]): ?>
-            <div class="zoom-container">
-              <a href="<?= $post['image'] ?>" target="_blank"><img src="<?= $post['image'] ?>" class="card-img-top w-100 zoomable" alt="Post Image" style="height:400px; object-fit:contain; background-color:#f8f9fa;"></a> 
-            </div>
-            <?php endif; ?>
-
-          <div class="card-body">
-            <h5 class="fw-semibold"><?= htmlspecialchars($post["title"]) ?></h5>
-            <p class="text-muted"><?= nl2br(htmlspecialchars($post["content"])) ?></p>
-
-            <!-- TAGS -->
-            <div class="mb-2">
-              <?php
-              $tg = $conn->query("
-                SELECT t.name FROM tags t
-                JOIN post_tags pt ON pt.tag_id = t.id
-                WHERE pt.post_id = {$post['id']}
-              ");
-              while ($tagRow = $tg->fetch_assoc()):
-              ?>
-                <span class="badge-tag">#<?= $tagRow["name"] ?></span>
-              <?php endwhile; ?>
-
-              <?php if( $tg->num_rows === 0 ): ?>
-                <span class="text-muted small">No tags</span>
-              <?php endif; ?>
-            </div>
-
-            <!-- POST META & ACTIONS -->
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <?php if ($_SESSION["user_id"] == $post["user_id"]): ?>
-                <div class="d-flex gap-1">
-                  <a href="edit.php?id=<?= $post['id'] ?>" class="btn btn-soft btn-sm">Edit</a>
-                  <a href="delete.php?id=<?= $post['id'] ?>"
-                     onclick="return confirm('Delete this post?')"
-                     class="btn btn-soft btn-sm text-danger">Delete</a>
-                </div>
-              <?php endif; ?>
-            </div>
-
-            <!-- LIKES -->
-            <?php
-            $likeCount = $conn->query(
-              "SELECT COUNT(*) AS total FROM likes WHERE post_id={$post['id']}"
-            )->fetch_assoc()["total"];
-
-            $userLiked = $conn->query(
-              "SELECT id FROM likes WHERE post_id={$post['id']} AND user_id={$_SESSION['user_id']}"
-            )->num_rows > 0;
-            ?>
-            <div class="d-flex align-items-center gap-3 mb-2">
-              <a href="like.php?post_id=<?= $post['id'] ?>"
-                 class="btn btn-sm <?= $userLiked ? 'btn-primary' : 'btn-outline-primary' ?>"
-                 onclick="return false;"
-                 data-post-id="<?= $post['id'] ?>">
-                ❤️ <span class="like-count"><?= $likeCount ?></span>
-              </a>
-
-            </div>
-
-            </div>
-      </div>
-
+<!-- TAG SIDEBAR -->
+<div class="col-md-2">
+  <div class="sidebar p-3">
+    <h6 class="fw-bold mb-3">Trending Tags</h6>
+    <div class="d-flex flex-wrap gap-2">
+      <?php while($t=$tags->fetch_assoc()): ?>
+        <a href="?tag=<?= $t['name'] ?>" class="badge-tag">#<?= $t['name'] ?></a>
       <?php endwhile; ?>
+    </div>
+  </div>
+</div>
 
-      <?php if ($posts->num_rows === 0): ?>
-        <p class="text-center text-muted">No posts found. Please reload the page.</p>
+<!-- POSTS -->
+<div class="col-md-7 mx-auto">
+
+<?php while($post=$posts->fetch_assoc()): ?>
+
+<?php
+$likeCount = $conn->query(
+  "SELECT COUNT(*) total FROM likes WHERE post_id={$post['id']}"
+)->fetch_assoc()['total'];
+
+$userLiked = $conn->query(
+  "SELECT id FROM likes WHERE post_id={$post['id']} AND user_id={$_SESSION['user_id']}"
+)->num_rows > 0;
+
+$tg = $conn->query("
+  SELECT t.name FROM tags t
+  JOIN post_tags pt ON pt.tag_id=t.id
+  WHERE pt.post_id={$post['id']}
+");
+?>
+
+<div class="card mb-4">
+  <div class="card-body">
+
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <img src="<?= $post['avatar'] ?>" class="rounded-circle"
+        style="width:36px;height:36px;object-fit:cover; border:2px solid var(--brand);">
+      <strong style="color:var(--brand);"><?= $post['username'] ?></strong>
+      <span class=" small ms-auto" style="font-size:13px; color:var(--brand);">
+        <?= date("M d, Y", strtotime($post['created_at'])) ?>
+      </span>
+    </div>
+
+    <h5 class="fw-semibold"><?= htmlspecialchars($post['title']) ?></h5>
+    <p class="text-muted"><?= nl2br(htmlspecialchars($post['content'])) ?></p>
+
+    <?php if($post['image']): ?>
+      <img src="<?= $post['image'] ?>" class="w-100 mb-3"
+        style="max-height:420px;object-fit:contain;border-radius:12px;">
+    <?php endif; ?>
+
+    <div class="mb-3 d-flex flex-wrap gap-2">
+      <?php while($tr=$tg->fetch_assoc()): ?>
+        <span class="badge-tag">#<?= $tr['name'] ?></span>
+      <?php endwhile; ?>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center">
+      <a href="like.php?post_id=<?= $post['id'] ?>"
+         class="btn btn-sm <?= $userLiked?'btn-primary':'btn-outline-primary' ?>"
+         data-post-id="<?= $post['id'] ?>">
+        👍 <span class="like-count"><?= $likeCount ?></span>
+      </a>
+
+      <?php if($_SESSION['user_id']==$post['user_id']): ?>
+        <div class="d-flex gap-2">
+          <!-- 3 dots -->
+          <button data-bs-toggle="dropdown" class="btn btn-soft btn-sm text-white">⋮</button>
+          <div class="dropdown-menu border-0 shadow-sm text-small">
+            <a href="edit.php?id=<?= $post['id'] ?>" class="dropdown-item">Edit</a>
+            <form method="POST" action="delete.php"  class="d-inline">
+              <input type="hidden" name="id" value="<?= $post['id'] ?>">
+              <button class="dropdown-item">Delete</button>
+            </form>
+          </div>
+        </div>
       <?php endif; ?>
-      
     </div>
 
   </div>
 </div>
 
+<?php endwhile; ?>
 
-<!--modal-->
-<div class="modal fade" id="askModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content rounded-4 border-0 shadow">
+</div>
+</div>
+</div>
 
-      <!-- Modal Header -->
-      <div class="modal-header border-0">
-        <h5 class="modal-title fw-bold">Ask the DevRum Community</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<!-- ASK MODAL -->
+<div class="modal fade" id="askModal">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <form class="modal-content p-4" action="store.php" method="POST" enctype="multipart/form-data"
+      style="background:var(--card);border-radius:20px;">
+      <h5 class="fw-bold mb-3">Ask DevRum</h5>
+
+      <input name="title" class="form-control mb-3" placeholder="Question title" required>
+      <textarea name="content" class="form-control mb-3" rows="4"
+        placeholder="Explain your issue..." required></textarea>
+
+      <input name="tags" class="form-control mb-3" placeholder="php, js, mysql">
+
+      <div class="drop-zone" id="dropZone">Drag & drop image or click</div>
+      <input type="file" name="image" id="imageInput" class="d-none" accept="image/*">
+
+      <div class="text-end mt-3">
+        <button class="btn btn-primary rounded-pill px-4">Post</button>
       </div>
-
-      <!-- Modal Body -->
-      <form action="store.php" method="POST" enctype="multipart/form-data">
-        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
-
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Title</label>
-            <input name="title" class="form-control form-control-lg" placeholder="What's your question?" required>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Details</label>
-            <textarea 
-              name="content"
-              class="form-control"
-              rows="4"
-              placeholder="Explain your problem, share code, errors, etc..."
-              required></textarea>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Tags</label>
-            <input 
-              name="tags"
-              class="form-control"
-              placeholder="php, laravel, javascript">
-            <small class="text-muted">Separate tags with commas</small>
-          </div>
-
-          <img
-              id="preview-img"
-              src="#"
-              alt="Image Preview"
-              class="mb-3 border-lg"
-              style="width:100%; max-height:400px; object-fit:contain; display:none;"
-            />
-
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Code / Screenshot</label>
-            <div class="drop-zone" id="dropZone">
-              <div class="drop-zone-content">
-                <i class="bi bi-cloud-upload fs-1 text-muted mb-2"></i>
-                <p class="mb-1">Drag & drop your image here</p>
-                <p class="text-muted small">or <span class="text-primary fw-semibold" style="cursor: pointer;" onclick="document.getElementById('imageInput').click()">browse files</span></p>
-                <small class="text-muted">Supported: JPG, PNG, GIF (Max 5MB)</small>
-              </div>
-              <input 
-                type="file" 
-                name="image" 
-                class="form-control d-none" 
-                accept="image/*"
-                id="imageInput">
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Modal Footer -->
-        <div class="modal-footer border-0">
-          <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">
-            Cancel
-          </button>
-          <button type="submit" class="btn btn-primary rounded-pill px-4">
-            Post
-          </button>
-        </div>
-      </form>
-
-    </div>
+    </form>
   </div>
 </div>
 
-
-<!-- Toast -->
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-  <div id="toast" class="toast">
-    <div class="toast-body"></div>
-  </div>
-</div>
-
-<footer class="bg-light mt-5 py-3 border-top"> 
-  <div class="text-center p-3 text-muted small">
-    &copy; <?= date("Y") ?> DevRum. All rights reserved.
-    <br> Made with ❤️ for developers by <a href="https://github.com/gylepatrick" class="text-decoration-none">dev_gpl</a>.
-  </div>
-
+<footer class="text-center py-4 mt-5">
+  © <?= date('Y') ?> DevRum · Built for devs 🧑‍💻
 </footer>
 
-<?php if (isset($_SESSION["toast"])): ?>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="../js/toast.js"></script>
 <script>
-showToast("<?= $_SESSION['toast'][1] ?>", "<?= $_SESSION['toast'][0] ?>");
-</script>
-<?php unset($_SESSION["toast"]); endif; ?>
-
-<script>
-document.querySelectorAll('.show-more-comments').forEach(btn => {
-  btn.addEventListener('click', function() {
-    const postId = this.dataset.postId;
-    let offset = parseInt(this.dataset.offset);
-    const total = parseInt(this.dataset.total);
-
-    fetch(`load_comments.php?post_id=${postId}&offset=${offset}`)
-      .then(res => res.text())
-      .then(html => {
-        const container = document.querySelector(`#comment-section-${postId} .comments-list`);
-        container.insertAdjacentHTML('beforeend', html);
-
-        offset += 3;
-        this.dataset.offset = offset;
-
-        // hide button if all comments loaded
-        if (offset >= total) {
-          this.style.display = 'none';
-        }
-      });
-  });
+document.querySelectorAll('[data-post-id]').forEach(btn=>{
+  btn.onclick=e=>{
+    e.preventDefault();
+    fetch(btn.href).then(()=> {
+      btn.classList.toggle('btn-primary');
+      btn.classList.toggle('btn-outline-primary');
+      fetch(`like_count.php?post_id=${btn.dataset.postId}`)
+        .then(r=>r.text())
+        .then(c=>btn.querySelector('.like-count').innerText=c);
+    });
+  }
 });
+
+const dz=document.getElementById('dropZone');
+const input=document.getElementById('imageInput');
+dz.onclick=()=>input.click();
+dz.ondrop=e=>{
+  e.preventDefault();
+  input.files=e.dataTransfer.files;
+};
+dz.ondragover=e=>dz.classList.add('dragover');
+dz.ondragleave=e=>dz.classList.remove('dragover');
 </script>
-
-<script>
-document.querySelectorAll('[data-post-id]').forEach(btn => {
-  btn.addEventListener('click', function(e) {
-    e.preventDefault(); // prevent default navigation
-
-    const postId = this.dataset.postId;
-
-    // send like/unlike request
-    fetch(`like.php?post_id=${postId}`)
-      .then(res => res.text())
-      .then(() => {
-        // toggle button style
-        if (this.classList.contains('btn-primary')) {
-          this.classList.remove('btn-primary');
-          this.classList.add('btn-outline-primary');
-        } else {
-          this.classList.remove('btn-outline-primary');
-          this.classList.add('btn-primary');
-        }
-
-        // update like count dynamically
-        fetch(`like_count.php?post_id=${postId}`)
-          .then(res => res.text())
-          .then(count => {
-            this.querySelector('.like-count').innerText = count;
-          });
-      });
-  });
-});
-</script>
-
-
-<script>
-      const dropZone = document.getElementById('dropZone');
-      const imageInput = document.getElementById('imageInput');
-      const previewImg = document.getElementById('preview-img');
-
-      // Prevent default drag behaviors
-      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, preventDefaults, false);
-        document.body.addEventListener(eventName, preventDefaults, false);
-      });
-
-      // Highlight drop zone when dragging over it
-      ['dragenter', 'dragover'].forEach(eventName => {
-        dropZone.addEventListener(eventName, highlight, false);
-      });
-
-      ['dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, unhighlight, false);
-      });
-
-      // Handle drop
-      dropZone.addEventListener('drop', handleDrop, false);
-
-      // Click to open file dialog
-      dropZone.addEventListener('click', () => {
-        imageInput.click();
-      });
-
-      function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-
-      function highlight(e) {
-        dropZone.classList.add('dragover');
-      }
-
-      function unhighlight(e) {
-        dropZone.classList.remove('dragover');
-      }
-
-      function handleDrop(e) {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-
-        if (files.length > 0) {
-          imageInput.files = files;
-          // Trigger change event to show preview
-          imageInput.dispatchEvent(new Event('change'));
-        }
-      }
-
-      // Existing image preview script
-      imageInput.addEventListener("change", function (event) {
-        const file = event.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            previewImg.src = e.target.result;
-            previewImg.style.display = "block";
-          };
-          reader.readAsDataURL(file);
-        } else {
-          previewImg.src = "#";
-          previewImg.style.display = "none";
-        }
-      });
-    </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-
 
 </body>
 </html>

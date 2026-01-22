@@ -81,11 +81,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     Enter the 6-digit code sent to your email
   </p>
 
+  <!-- verification expiration timer countdown -->
+
+  <div class="text-center small text-muted mb-3">
+    The code expires in 10 minutes.
+
+  </div>
+
+
   <form method="POST" class="d-flex flex-column gap-3">
     <input 
       name="code"
-      class="form-control form-control-lg text-center rounded-3"
-      placeholder="123456"
+      class="form-control form-control-lg text-center rounded-3 letter-spacing-3"
+      placeholder="******"
       maxlength="6"
       required
     >
