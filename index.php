@@ -8,45 +8,7 @@
     <!-- Bootstrap 5 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Custom CSS -->
-    <style>
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-        }
-
-        .brand {
-            color: #00e5ff;
-        }
-
-        .hero-card {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
-            border-radius: 1rem;
-            padding: 3rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .btn-dev {
-            background-color: #00e5ff;
-            color: #000;
-            font-weight: 600;
-            border: none;
-        }
-
-        .btn-dev:hover {
-            background-color: #00bcd4;
-            color: #000;
-        }
-    </style>
+    <link rel="stylesheet" href="css/landing_page.css">
 </head>
 <body>
 
@@ -64,7 +26,7 @@
                             and build cool stuff together.
                         </p>
                         <div class="d-flex justify-content-center gap-3">
-                            <a href="auth/register.php" class="btn btn-dev btn-lg px-4">Join the Forum</a>
+                            <a href="auth/register.php" class="btn btn-dev btn-sm btn-lg px-4">Ask a question</a>
                         </div>
                     </div>
                 </div>

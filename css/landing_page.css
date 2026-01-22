@@ -1,0 +1,36 @@
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f2027, #208eb3, #64452c);
+  color: #ffffff;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  color: #00e5ff;
+}
+
+.hero-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 3rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.btn-dev {
+  background-color: #00e5ff;
+  color: #000;
+  font-weight: 600;
+  border: none;
+}
+
+.btn-dev:hover {
+  background-color: #00bcd4;
+  color: #000;
+}
