@@ -1,25 +1,36 @@
 <?php include "../config/auth/register.php"; ?>
 <?php include "../components/auth/header.php"; ?>
 
-<div class="w-100" style="max-width: 380px;">
-
-  <!-- Brand -->
-  <h1 class="text-center fw-bold mb-4">
-    <span class="text-primary">DEV</span>Rum
-  </h1>
-
+<div class="w-100" style="max-width: 680px;">
   <!-- Card -->
-  <div class="card shadow-sm rounded-4 border-0 p-4">
+  <div class="card shadow-sm rounded-4 bg-white border-0 p-4">
+
+    <?php include "../components/brand.php"; ?>
 
     <h4 class="fw-bold text-center mb-3">Create your account</h4>
 
     <form method="POST" class="d-flex flex-column gap-3">
 
-      <input name="username" class="form-control form-control-lg" placeholder="Username" required>
-      <input name="fullname" class="form-control form-control-lg" placeholder="Full name" required>
+      <div class="row">
+        <div class="col-6">
+           <input name="username" class="form-control form-control-lg" placeholder="Username" required>
+        </div>
+        <div class="col-6">
+            <input name="fullname" class="form-control form-control-lg" placeholder="Full name" required>
+        </div>
+      </div>
+
       <input type="email" name="email" class="form-control form-control-lg" placeholder="Email address" required>
-      <input type="password" name="password" class="form-control form-control-lg" placeholder="Password" required>
-      <input type="password" name="confirm_password" class="form-control form-control-lg" placeholder="Confirm password" required>
+
+      <div class="row">
+        <div class="col-6">
+          <input type="password" name="password" class="form-control form-control-lg" placeholder="Password" required>
+        </div>
+        <div class="col-6">
+          <input type="password" name="confirm_password" class="form-control form-control-lg" placeholder="Confirm password" required>
+        </div>
+      </div>
+
 
       <!-- Terms -->
       <div class="form-check small">

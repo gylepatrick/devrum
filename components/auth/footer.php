@@ -1,7 +1,17 @@
 <!-- Toast Container -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
-  <div id="toast" class="toast">
-    <div class="toast-body"></div>
+  <div class="toast" id="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="me-auto">DevRum | Notification</strong>
+      <small class="text-muted">
+        <!-- show how many seconds ago -->
+        just now
+      </small>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      See? Just like this.
+    </div>
   </div>
 </div>
 
